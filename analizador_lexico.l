@@ -2,60 +2,131 @@
 #include <stdio.h>
 %}
 
-%option noyywrap
+DIGITO   [0-9]
+LETRA    [a-zA-Z]
+NUMERO   {DIGITO}+
+OPERADOR [+*-/]
+IDENTIFICADOR {LETRA}(({LETRA}|{DIGITO}|_)*)
 
 %%
 
-(for|while|if|true|false|else|case|break) {
-    printf("%s Palabras reservadas o claves\n", yytext);
+(int|char|float|double|bool|void) {
+    printf("Palabra-reservada\n", yytext, yytext);
 }
 
-[a-z]+ {
-    printf("%s Es una Constante\n", yytext);
+(for|while|do) {
+    printf("Palabra-reservada\n", yytext, yytext);
 }
 
-[1-9][0-9]* {
-    printf("%s Numero\n", yytext);
+(return|break|continue|switch|case|default) {
+    printf("Palabra-reservada\n", yytext, yytext);
 }
 
-bin[01]+ {
-    printf("%s Binario\n", yytext);
+(if|else|elseif) {
+    printf("Palabra-reservada\n", yytext, yytext);
 }
 
-[*] {
-    printf("%s Multiplicacion\n", yytext);
+
+main {
+    printf("Funcion-principal\n", yytext);
 }
 
-[+] {
-    printf("%s Suma\n", yytext);
+{IDENTIFICADOR} {
+    printf("Identificador\n", yytext);
 }
 
-[-] {
-    printf("%s Menos\n", yytext);
+{NUMERO} {
+    printf("Numero\n", yytext, yytext);
 }
 
-[/] {
-    printf("%s Division\n", yytext);
+{NUMERO}\.{NUMERO} {
+    printf("Numero-decimal\n", yytext, yytext);
 }
 
-[(){}] {
-    printf("%s Delimitador\n", yytext);
+-?{NUMERO} {
+    printf("Número negativo\n", yytext, yytext);
 }
 
-[;,] {
-    printf("%s Puntuacion\n", yytext);
+-?{NUMERO}\.{NUMERO} {
+    printf("Numero-decimal-negativo\n", yytext, yytext);
 }
 
-[<>=] {
-    printf("%s Operador de Comparacion\n", yytext);
+\+ {
+    printf("suma\n", yytext);
 }
 
-[a-zA-Z_][a-zA-Z0-9_]* {
-    printf("%s Identificador\n", yytext);
+\++ {
+    printf("incremento\n", yytext);
 }
 
-.|\n {
-    // Ignorar caracteres no reconocidos
+\- {
+    printf("resta\n", yytext);
+}
+
+
+\-- {
+    printf("decremento\n", yytext);
+}
+
+\* {
+    printf("multiplicacion\n", yytext);
+}
+
+\/ {
+   printf("division\n", yytext);
+}
+
+
+\% {
+    printf("modulo\n", yytext);
+}
+
+! {
+    printf("NOT\n", yytext);
+}
+
+\{ {
+    printf("A-llave: \n", yytext);
+}
+
+\} {
+    printf("B-llave:\n", yytext);
+}
+
+\[ {
+    printf("Símbolo de apertura de corchete\n", yytext);
+}
+
+\] {
+    printf("Símbolo de cierre de corchete \n", yytext);
+}
+
+\( {
+    printf("Símbolo de apertura de paréntesis\n", yytext);
+}
+
+\) {
+    printf("Símbolo de cierre de paréntesis \n", yytext);
+}
+
+= {
+    printf("asignacion \n", yytext);
+}
+
+== {
+    printf("comparacion: \n", yytext);
+}
+
+!= {
+    printf("comparacion: \n", yytext);
+}
+
+[ \t\n] {
+    // Ignorar espacios en blanco y saltos de línea
+}
+
+. {
+    printf("Carácter no reconocido\n", yytext);
 }
 
 %%

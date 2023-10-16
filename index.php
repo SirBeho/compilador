@@ -1,31 +1,17 @@
 <?php
-         $output =["Resulados"];
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $texto = $_POST["texto"];
-      
-            // Compilar el analizador léxico
-            exec("flex analizador_lexico.l"); // Asegúrate de que "flex" esté instalado
-        
-            // Compilar el archivo C generado por Flex
-            exec("gcc -o analizador lex.yy.c -lfl"); // Esto crea un ejecutable llamado "analizador"
-        
-            // Ejecutar el analizador léxico con la cadena de texto proporcionada
-            $output = shell_exec('echo ' . $texto. ' | analizador.exe');
-        
-            // Procesar la salida en un array asociativo
-            $output = explode("\n", $output);
-            
-            
-           
-        }
-       
-        ?>
+ exec("flex analizador_lexico.l");       
+ exec("gcc -o analizador lex.yy.c -lfl"); 
+?>
 
 <!DOCTYPE html>
 <html>
 <head>
     <title>Analizador Léxico</title>
     <style>
+          *{
+            font-family: "Consolas";
+        }
+        
         body {
             font-family: Arial, sans-serif;
             background-color: #f2f2f2;
@@ -95,14 +81,48 @@
     </header>
     <div class="container">
         <form method="POST">
-            <input type="text" value="<?php echo isset($_POST["texto"]) ? $_POST["texto"] : ""?>" name="texto" placeholder="Ingrese la cadena de texto" style="padding: 10px; width: 70%; border: 1px solid #ccc; border-radius: 3px; margin-right: 10px;">
-            <button type="submit" style="padding: 10px 20px; background-color: #333; color: #fff; border: none; cursor: pointer;">Analizar</button>
+            <input type="text" id="texto" name="texto" placeholder="Ingrese la cadena de texto" style="padding: 10px; width: 70%; border: 1px solid #ccc; border-radius: 3px; margin-right: 10px;">
+            <button type="button" id="analizar" style="padding: 10px 20px; background-color: #333; color: #fff; border: none; cursor: pointer;">Analizar</button>
         </form>
-        <div class="output">
-                <?php foreach ($output as $line) : ?>
-                    <div><?= $line ?></div>
-            <?php endforeach; ?>
+        <div class="output" id="resultado">
+            Resultados
         </div>
     </div>
+
+    <script>
+        const textoInput = document.getElementById('texto');
+        const analizarButton = document.getElementById('analizar');
+        const resultadoDiv = document.getElementById('resultado');
+
+        analizarButton.addEventListener('click', () => {
+            const texto = textoInput.value;
+            actualizarResultado(texto);
+        });
+
+        textoInput.addEventListener('input', () => {
+            const texto = textoInput.value;
+            actualizarResultado(texto);
+        });
+
+        function actualizarResultado(texto) {
+            // Realizar una solicitud AJAX al servidor PHP para enviar la cadena de texto
+            // y recibir los resultados del análisis léxico.
+            fetch('analizar.php', {
+                method: 'POST',
+                body: new URLSearchParams({ texto }),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+            })
+            .then(response => response.text())
+            .then(resultados => {
+
+                resultadoDiv.innerHTML  = resultados.replace(/ /g, '&nbsp;').replace(/\n/g, '<br>');
+            })
+            .catch(error => {
+                console.error('Error en la solicitud AJAX:', error);
+            });
+        }
+    </script>
 </body>
 </html>
