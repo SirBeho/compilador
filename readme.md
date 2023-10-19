@@ -2,6 +2,9 @@
 
 Este Readme proporciona información detallada sobre dos analizadores, `lexico.l` y `sintactico.y`, escritos en C, así como el código PHP y HTML asociado para crear una interfaz web que utilice estos analizadores.
 
+Para [mas informacion](https://youtu.be/pKObh-1xLYg) vea el video de su funcionalidad en YouTube 
+  
+
 ## Analizador Léxico (`lexico.l`)
 
 ### Descripción
