@@ -1,6 +1,4 @@
 <?php
-exec("flex lexico_p.l");
-exec("gcc -o analizador_lexico lex.yy.c -lfl");
 
 exec("flex lexico.l");
 exec("bison -d sintactico.y");
@@ -89,24 +87,24 @@ exec("gcc -o analizador lex.yy.c sintactico.tab.c -lfl");
     <div class="container">
         <form method="POST">
             <textarea name="texto" id="texto" cols="30" rows="5" placeholder="Ingrese el codigo" style="padding: 10px; width: 70%; border: 1px solid #ccc; border-radius: 3px; margin-right: 10px;"></textarea>
-           
-                <div style="display: flex; flex-direction: column;">
+
+            <div style="display: flex; flex-direction: column;">
                 <button type="button" id="analizar" style="padding: 10px 20px; background-color: #333; color: #fff; border: none; cursor: pointer;">Analizar</button>
 
-            <label>Lexico<input type="checkbox" id="lex"></label>
-            <label>Sintactico<input type="checkbox" id="sin"></label>
-        </div>
-           
+                <label>Lexico<input checked type="checkbox" id="lex"></label>
+                <label>Sintactico<input checked type="checkbox" id="sin"></label>
+            </div>
+
         </form>
 
-        
-       
+
+
 
         <div class="output" id="resultado">
             Analisis Lexico
         </div>
         <div class="output" id="msj">
-          Analisis Sintactico
+            Analisis Sintactico
         </div>
     </div>
 
@@ -143,28 +141,35 @@ exec("gcc -o analizador lex.yy.c sintactico.tab.c -lfl");
                 })
                 .then(response => response.text())
                 .then(resultados => {
+                    console.log('Respuesta:', resultados);
 
-                    resultados = JSON.parse(resultados);
-                    resultadoDiv.innerHTML = "Analisis Lexico";
-                    msj.innerHTML = "Analisis Sintactico";
-                    if (lexCheckbox.checked) {
-                        resultadoDiv.innerHTML = 'Valor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Token <br>';
-                        resultadoDiv.innerHTML += resultados.tokens.replace(/\n/g, '<br>').replace(/ /g, '&nbsp;')
-                    }
+                    try {
+                        let resultado = JSON.parse(JSON.parse(resultados));
+                        console.log('Resultado:', resultado);
 
-                    if (sinCheckbox.checked) {
-                        msj.innerHTML = resultados.msj.replace(/\n/g, '<br>').replace(/ /g, '&nbsp;')
-                        if (resultados.msj.includes("syntax error")) {
-                            msj.style.color = 'red';
-                        } else {
-                            msj.style.color = '';
+                        if (lexCheckbox.checked) {
+                            resultadoDiv.innerHTML = 'Valor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Token <br>';
+                            resultado.lexico.forEach(token => {
+                                resultadoDiv.innerHTML += `${token.value}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${token.type}<br>`;
+                            });
                         }
+
+                        if (sinCheckbox.checked) {
+                            resultado.sintactico.forEach(token => {
+                                msj.innerHTML += `${token.type}<br>`;
+                            });
+
+                            if (msj.innerHTML.includes("syntax error")) {
+                                msj.style.color = 'red';
+                            } else {
+                                msj.style.color = '';
+                            }
+                        }
+
+                    } catch (error) {
+                        console.error('Error al convertir la respuesta en un objeto:', error);
                     }
-
-
-
-                })
-                .catch(error => {
+                }).catch(error => {
                     console.error('Error en la solicitud AJAX:', error);
                 });
         }

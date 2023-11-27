@@ -396,8 +396,15 @@ char *yytext;
 #include <string.h>    
 #include <stdio.h>
 #include <stdlib.h>
-#include "sintactico.tab.h" 
-#line 401 "lex.yy.c"
+#include "sintactico.tab.h"
+
+void add_token(char* type, char* value);
+int yyparse(void);
+
+void print_tokens();
+void print_syntax_tokens();
+
+#line 408 "lex.yy.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -548,10 +555,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 11 "lexico.l"
+#line 20 "lexico.l"
 
 
-#line 555 "lex.yy.c"
+#line 562 "lex.yy.c"
 
 	if ( yy_init )
 		{
@@ -636,92 +643,103 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 13 "lexico.l"
+#line 22 "lexico.l"
 ;
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 15 "lexico.l"
+#line 24 "lexico.l"
 {
-    yylval.str = strdup(yytext); 
+   add_token("TIPO_DE_DATO", yytext);
+    yylval.str = strdup(yytext);
     return TIPO_DE_DATO;
 }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 21 "lexico.l"
+#line 31 "lexico.l"
 {
-    yylval.str = strdup(yytext); 
+   add_token("PALABRA_RESERVADA", yytext);
+ yylval.str = strdup(yytext);  
     return PALABRA_RESERVADA;
 }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 26 "lexico.l"
+#line 37 "lexico.l"
 {
-    yylval.str = strdup(yytext); 
+   add_token("IDENTIFICADOR", yytext);
+ yylval.str = strdup(yytext);  
     return IDENTIFICADOR;
 }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 32 "lexico.l"
+#line 44 "lexico.l"
 {
-    yylval.str = strdup(yytext); 
+   add_token("NUMERO", yytext);
+ yylval.str = strdup(yytext);  
     return NUMERO;
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 37 "lexico.l"
+#line 50 "lexico.l"
 {
-   yylval.str = strdup(yytext);
+  add_token("SIMBOLO_ASIGNACION", yytext);
+ yylval.str = strdup(yytext); 
     return SIMBOLO_ASIGNACION;
 }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 43 "lexico.l"
+#line 57 "lexico.l"
 {
-    yylval.str = strdup(yytext);
+  add_token("COMPARACION", yytext);
+ yylval.str = strdup(yytext); 
     return COMPARACION;
 }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 48 "lexico.l"
+#line 63 "lexico.l"
 {
+    add_token("FIN", yytext);
+    yylval.str = strdup(yytext);
     return FIN;  
 }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 53 "lexico.l"
+#line 70 "lexico.l"
 {
-    yylval.str = strdup(yytext);
+   add_token(*yytext, yytext);
+ yylval.str = strdup(yytext); 
     return *yytext; 
 }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 58 "lexico.l"
+#line 76 "lexico.l"
 {
+    add_token(*yytext, yytext);
+    yylval.str = strdup(yytext); 
     return *yytext;  
 }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 62 "lexico.l"
+#line 82 "lexico.l"
 {
     fprintf(stderr, "Caracter no reconocido: %s\n", yytext);
 }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 66 "lexico.l"
+#line 86 "lexico.l"
 ECHO;
 	YY_BREAK
-#line 725 "lex.yy.c"
+#line 743 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1607,18 +1625,19 @@ int main()
 	return 0;
 	}
 #endif
-#line 66 "lexico.l"
+#line 86 "lexico.l"
 
 
-void print_tokens();
 
-int yyparse(void);
 
 int main() {
     
     yyparse();
-
-     print_tokens();
+    printf("\{");
+    print_tokens();
+    print_syntax_tokens();
+    
+     printf("\}");
     return 0;
 }
 
