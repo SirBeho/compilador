@@ -1,28 +1,26 @@
 <?php
 
-// if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST["texto"] != '') {
+
+
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST["texto"] != '') {  
+ //if (true) {  
+
+   $texto = $_POST["texto"];
    
+   //$texto = str_replace(array("\r", "\n"), '', $texto);
+   //$texto = str_replace('%', '"%"', $texto);
+   //$texto= str_replace('&', '"&"', $texto); 
+   //$texto= str_replace('<', '^<', $texto); 
 
-if (true) {
+   //$texto = escapeshellarg($texto);
+   //$texto = trim($texto, '"'); // Eliminar las comillas al principio y al final
 
-    $texto = $_POST["texto"];
-   
-    $texto = str_replace(array("\r", "\n"), '', $texto);
-
-    $textoAnalizar = escapeshellarg($texto);
-
-    $analisis = shell_exec('echo ' .$texto . '| analizador.exe 2>&1');
-
-
+   $analisis = shell_exec('echo  "---'.$texto.'---"  | .\analizador.exe 2>&1');
   
-   /*  $resultado = [
-       
-        "msj" => $analisis
-    ];  */
-
-    // Enviar la respuesta en formato JSON
-     header('Content-Type: application/json');
-    echo json_encode($analisis);
+   // Enviar la respuesta en formato JSON
+   header('Content-Type: application/json');
+   echo json_encode($analisis);
 }
 
 

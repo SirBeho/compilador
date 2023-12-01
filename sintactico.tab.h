@@ -39,16 +39,18 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     TIPO_DE_DATO = 258,
-     ASIGNACION = 259,
-     COMPARACION = 260,
-     FIN = 261,
-     IDENTIFICADOR = 262,
-     NUMERO = 263,
+     ERROR = 258,
+     NUMERO = 259,
+     TIPO_DE_DATO = 260,
+     COMPARACION = 261,
+     FIN = 262,
+     IMPRIMIR_VAR = 263,
      PALABRA_RESERVADA = 264,
-     SIMBOLO_ASIGNACION = 265,
-     OPERADOR = 266,
-     SIGNO_NEGATIVO = 267
+     IDENTIFICADOR = 265,
+     CONST_CADENA = 266,
+     SIMBOLO_ASIGNACION = 267,
+     SIGNO_NEGATIVO = 268,
+     INCREMENTO = 269
    };
 #endif
 
@@ -59,14 +61,15 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 79 "sintactico.y"
+#line 248 "sintactico.y"
 
-    char* str; // Definir una estructura que coincida con la del analizador léxico
+    double entero;
+    char* str; 
 
 
 
 /* Line 1676 of yacc.c  */
-#line 70 "sintactico.tab.h"
+#line 73 "sintactico.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

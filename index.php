@@ -31,7 +31,7 @@ exec("gcc -o analizador lex.yy.c sintactico.tab.c -lfl");
         }
 
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
             background-color: #fff;
@@ -68,54 +68,109 @@ exec("gcc -o analizador lex.yy.c sintactico.tab.c -lfl");
 
         .output {
             background-color: #f9f9f9;
-            padding: 10px;
+
             border: 1px solid #ddd;
             border-radius: 3px;
             margin-top: 1rem;
+            margin-right: 1rem;
 
 
             border-radius: .5rem;
+            overflow: hidden;
+        }
+
+        .output span {
+            display: block;
+            width: 100%;
+            background: #cdcdcd;
+            padding-inline: 5px;
+            text-align: center;
 
         }
+
+        .output table {
+            padding: 10px;
+            width: 100%;
+        }
+
+        .espacio {
+            padding-right: 100px;
+        }
+      
+      
+    #simbolo th, #simbolo td {
+      border: 1px solid #000; /* Grosor y color de los bordes */
+      padding: 8px; /* Espaciado interno de las celdas */
+      text-align: left; /* Alineación del texto */
+    }
     </style>
 </head>
 
 <body>
     <header>
-        <h1 style="font-size: 24px;">Analizador</h1>
+        <h1 style="font-size: 24px;">Compilador</h1>
     </header>
     <div class="container">
         <form method="POST">
             <textarea name="texto" id="texto" cols="30" rows="5" placeholder="Ingrese el codigo" style="padding: 10px; width: 70%; border: 1px solid #ccc; border-radius: 3px; margin-right: 10px;"></textarea>
-
             <div style="display: flex; flex-direction: column;">
                 <button type="button" id="analizar" style="padding: 10px 20px; background-color: #333; color: #fff; border: none; cursor: pointer;">Analizar</button>
-
                 <label>Lexico<input checked type="checkbox" id="lex"></label>
                 <label>Sintactico<input checked type="checkbox" id="sin"></label>
+                <label>Semantico<input checked type="checkbox" id="sem"></label>
+                <label>Tabla<input checked type="checkbox" id="tab"></label>
             </div>
-
         </form>
 
-
-
-
-        <div class="output" id="resultado">
-            Analisis Lexico
+        <div style="display: grid; grid-template-columns: 1fr 1fr;">
+        <div class="output">
+            <span>Analisis Lexico</span>
+            <table>
+                <tbody id="lexico">
+                </tbody>
+            </table>
         </div>
-        <div class="output" id="msj">
-            Analisis Sintactico
+
+        <div class="output">
+            <span>Analisis Sintactico - Pos fijo</span>
+            <table>
+                <tbody id="sintactico">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="output">
+            <span>Analisis Semantico</span>
+            <table>
+                <tbody id="semantico">
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="output">
+            <span>Tabla de Simbolos</span>
+            <table >
+                <tbody id="simbolo">
+                </tbody>
+            </table>
+        </div>
         </div>
     </div>
 
     <script>
         const textoInput = document.getElementById('texto');
         const analizarButton = document.getElementById('analizar');
-        const resultadoDiv = document.getElementById('resultado');
-        const msj = document.getElementById('msj');
+
+        const LexicoDiv = document.getElementById('lexico');
+        const SintacticoDiv = document.getElementById('sintactico');
+        const SemanticoDiv = document.getElementById('semantico');
+        const SimboloDiv = document.getElementById('simbolo');
 
         const lexCheckbox = document.getElementById('lex');
         const sinCheckbox = document.getElementById('sin');
+        const semCheckbox = document.getElementById('sem');
+        const tabCheckbox = document.getElementById('tab');
 
         analizarButton.addEventListener('click', () => {
             const texto = textoInput.value.replace(/\n/g, ' ');
@@ -124,7 +179,14 @@ exec("gcc -o analizador lex.yy.c sintactico.tab.c -lfl");
 
         textoInput.addEventListener('input', () => {
             const texto = textoInput.value.replace(/\n/g, ' ');
-            actualizarResultado(texto);
+            if(!texto){
+                LexicoDiv.innerHTML = '';
+                SintacticoDiv.innerHTML = '';
+                SemanticoDiv.innerHTML = '';
+                SimboloDiv.innerHTML = '';
+            }else{
+                actualizarResultado(texto);
+            }
         });
 
         function actualizarResultado(texto) {
@@ -141,30 +203,61 @@ exec("gcc -o analizador lex.yy.c sintactico.tab.c -lfl");
                 })
                 .then(response => response.text())
                 .then(resultados => {
-                    console.log('Respuesta:', resultados);
+                    console.log(resultados);
 
                     try {
                         let resultado = JSON.parse(JSON.parse(resultados));
                         console.log('Resultado:', resultado);
 
                         if (lexCheckbox.checked) {
-                            resultadoDiv.innerHTML = 'Valor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Token <br>';
+                            LexicoDiv.innerHTML = '<tr><td class="espacio">Valor</td><td>Token</td> </tr>';
                             resultado.lexico.forEach(token => {
-                                resultadoDiv.innerHTML += `${token.value}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${token.type}<br>`;
+                                LexicoDiv.innerHTML += ` <tr><td>${token.value}</td><td>${token.type}</td> </tr>`;
                             });
+                        }else{
+                            LexicoDiv.innerHTML = '';
                         }
 
                         if (sinCheckbox.checked) {
+                            SintacticoDiv.innerHTML = '';
                             resultado.sintactico.forEach(token => {
-                                msj.innerHTML += `${token.type}<br>`;
+                                SintacticoDiv.innerHTML += ` <tr><td>${token.type}</td> </tr>`;
                             });
 
-                            if (msj.innerHTML.includes("syntax error")) {
-                                msj.style.color = 'red';
+                            if (SintacticoDiv.innerHTML.includes("ERROR")) {
+                                SintacticoDiv.style.color = 'red';
                             } else {
-                                msj.style.color = '';
+                                SintacticoDiv.style.color = '';
                             }
+                        }else{
+                            SintacticoDiv.innerHTML = '';
                         }
+
+                        if (semCheckbox.checked) {
+                            SemanticoDiv.innerHTML = '';
+                            resultado.errores.forEach(token => {
+                                SemanticoDiv.innerHTML += ` <tr><td>${token}</td> </tr>`;
+                            });
+
+                            if (SemanticoDiv.innerHTML.includes("ERROR")) {
+                                SemanticoDiv.style.color = 'red';
+                            } else {
+                                SemanticoDiv.style.color = '';
+                            }
+                        }else{
+                            SemanticoDiv.innerHTML = '';
+                        }
+
+                        if (tabCheckbox.checked) {
+                            SimboloDiv.innerHTML = `<tr style="background: #e1e1e1;"><td >Tipo</td><td>Identificador</td><td>Valor</td> </tr>`;
+                            resultado.tabla_simbolos.forEach(token => {
+                                SimboloDiv.innerHTML += ` <tr><td >${token.tipo}</td><td >${token.identificador}</td><td >${token.valor}</td> </tr>`;
+                            });
+                        }else{
+                            SimboloDiv.innerHTML = '';
+                        }
+                        
+                        
 
                     } catch (error) {
                         console.error('Error al convertir la respuesta en un objeto:', error);
